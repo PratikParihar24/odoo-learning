@@ -119,9 +119,9 @@ class CandidateIntake(models.Model):
             if not record.resume_text:
                 raise UserError(_("Please upload a valid PDF resume or ensure there is text in the Resume Text field before running AI analysis."))
             
-            # For a production app, we would store this key in Odoo's ir.config_parameter settings.
-            # For this build, paste your key directly here.
             api_key = self.env['ir.config_parameter'].sudo().get_param('candidate_intake.groq_api_key')
+            if not api_key:
+                raise UserError(_("Groq API Key is not configured. Please set the 'candidate_intake.groq_api_key' parameter in System Parameters."))
             url = "https://api.groq.com/openai/v1/chat/completions"
             
             job_title = record.job_id.name if record.job_id else "a general position"
