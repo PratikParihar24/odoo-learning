@@ -8,10 +8,12 @@
         into official applicants in the Recruitment pipeline.
     """,
     'author': 'Pratik',
-    'depends': ['base', 'hr', 'hr_recruitment'],
+    'depends': ['base', 'hr', 'hr_recruitment', 'website'], 
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/candidate_intake_views.xml',
+        'views/website_form.xml',
     ],
     'installable': True,
     'application': False, # It's an extension, not a standalone app

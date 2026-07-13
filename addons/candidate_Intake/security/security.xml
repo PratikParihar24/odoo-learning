@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define a Category for our App's Security -->
+    <record id="module_category_candidate_intake" model="ir.module.category">
+        <field name="name">Candidate Intake</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- Group 1: Reviewer -->
+    <record id="group_intake_reviewer" model="res.groups">
+        <field name="name">Reviewer</field>
+        <field name="category_id" ref="module_category_candidate_intake"/>
+    </record>
+
+    <!-- Group 2: Manager (Inherits Reviewer powers) -->
+    <record id="group_intake_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_candidate_intake"/>
+        <field name="implied_ids" eval="[(4, ref('group_intake_reviewer'))]"/>
+    </record>
+    
+
+    <!-- RECORD RULE: Managers see absolutely everything -->
+    <record id="rule_intake_manager_all" model="ir.rule">
+        <field name="name">Managers see all candidates</field>
+        <field name="model_id" ref="model_hr_candidate_intake"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_intake_manager'))]"/>
+    </record>
+</odoo>

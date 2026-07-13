@@ -27,7 +27,9 @@
                 <header>
                     <button name="action_analyze_resume" string="Run AI Analysis" type="object" class="oe_highlight" icon="fa-magic"/>
                     <button name="action_start_review" string="Start Review" type="object" class="oe_highlight" invisible="status != 'new'"/>
-                    <button name="action_approve" string="Approve &amp; Convert" type="object" class="oe_highlight" invisible="status != 'review'"/>
+                    
+                    <button name="action_approve" string="Approve &amp; Convert" type="object" class="oe_highlight" invisible="status != 'review'" groups="candidate_Intake.group_intake_manager"/>
+                    
                     <button name="action_reject" string="Reject" type="object" invisible="status != 'review'"/>
                     <field name="status" widget="statusbar" statusbar_visible="new,review,approved,rejected"/>
                 </header>

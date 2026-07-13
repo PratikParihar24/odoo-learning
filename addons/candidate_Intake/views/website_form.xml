@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="apply_form_template" name="Candidate Application">
+        <t t-call="website.layout">
+            <div id="wrap" class="container mt-5 mb-5">
+                <h1 class="text-center mb-4">Apply for a Position</h1>
+                <form action="/jobs/submit" method="POST" class="w-50 mx-auto">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    
+                    <div class="mb-3">
+                        <label>Full Name</label>
+                        <input type="text" name="name" class="form-control" required="1"/>
+                    </div>
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" required="1"/>
+                    </div>
+                    <div class="mb-3">
+                        <label>Phone</label>
+                        <input type="text" name="phone" class="form-control"/>
+                    </div>
+                    <div class="mb-3">
+                        <label>Position</label>
+                        <select name="job_id" class="form-control" required="1">
+                            <option value="">Select a Job...</option>
+                            <t t-foreach="jobs" t-as="job">
+                                <option t-att-value="job.id"><t t-esc="job.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Paste Resume</label>
+                        <textarea name="resume_text" class="form-control" rows="6" required="1"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Submit Application</button>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <template id="apply_success_template" name="Application Success">
+        <t t-call="website.layout">
+            <div id="wrap" class="container mt-5 text-center">
+                <h1 class="text-success">Thank You!</h1>
+                <p class="lead">Your application has been submitted for review.</p>
+                <a href="/" class="btn btn-outline-primary mt-3">Return to Home</a>
+            </div>
+        </t>
+    </template>
+</odoo>
