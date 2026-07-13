@@ -64,6 +64,8 @@
                             <group>
                                 <field name="resume_text" placeholder="Paste the candidate's plain text resume here..."/>
                                 <field name="ai_summary"/>
+                                <field name="ai_strengths"/>
+                                <field name="ai_missing_skills"/>
                             </group>
                         </page>
                         <page string="Reviewer Notes" name="notes">

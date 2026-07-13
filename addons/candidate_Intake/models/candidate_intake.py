@@ -39,6 +39,8 @@ class CandidateIntake(models.Model):
     # --- PHASE 2: AI FIELDS ---
     resume_text = fields.Text(string="Resume Text (Paste Here)")
     ai_summary = fields.Text(string="AI Summary", readonly=True)
+    ai_strengths = fields.Text(string="Top Strengths", readonly=True)
+    ai_missing_skills = fields.Text(string="Missing Skills", readonly=True)
     ai_score = fields.Integer(string="AI Match Score (0-100)", readonly=True)
 
     # --- ACTION METHODS ---
@@ -126,14 +128,31 @@ class CandidateIntake(models.Model):
             
             job_title = record.job_id.name if record.job_id else "a general position"
             
-            prompt = f"""
-            Analyze the following resume for the position of {job_title}.
-            Provide a brief 3-sentence summary of their qualifications, and assign a match score from 0 to 100.
-            Respond strictly in valid JSON format like this: {{"summary": "...", "score": 85}}.
-            
-            Resume:
-            {record.resume_text}
-            """
+            prompt = f"""You are an expert, highly critical HR Recruiter. Analyze the following resume for the position of: {job_title}.
+
+Evaluate the candidate based on the following weighted criteria (100 points total):
+1. Skill Match (35 pts): Does the candidate possess the exact technical and soft skills required for a {job_title}? 
+2. Relevant Experience (35 pts): How closely does their past work history align with this specific role? 
+3. Measurable Impact (20 pts): Do they demonstrate actual results, metrics, and achievements, or just list basic duties?
+4. Professionalism & Quality (10 pts): Is the resume well-structured, clear, and free of irrelevant fluff?
+
+Scoring strictness rule:
+- 90-100: Exceptional (Top 1% candidate, perfect match, quantifiable impact).
+- 75-89: Strong (Hits most requirements, solid experience).
+- 50-74: Average/Entry (Meets basic baseline, but lacks deep relevant experience or impact).
+- 0-49: Poor Fit (Missing core requirements or irrelevant background).
+
+Respond STRICTLY in valid JSON format exactly like this:
+{{
+    "summary": "Brief 3-sentence summary.",
+    "score": 72,
+    "strengths": "- Point 1\\n- Point 2",
+    "missing": "- Point 1\\n- Point 2"
+}}
+
+Resume Text:
+{record.resume_text}
+"""
             
             headers = {
                 "Authorization": f"Bearer {api_key}",
@@ -160,7 +179,9 @@ class CandidateIntake(models.Model):
                 
                 record.write({
                     'ai_summary': ai_data.get('summary', 'No summary generated.'),
-                    'ai_score': int(ai_data.get('score', 0))
+                    'ai_score': int(ai_data.get('score', 0)),
+                    'ai_strengths': ai_data.get('strengths', 'None identified.'),
+                    'ai_missing_skills': ai_data.get('missing', 'None identified.'),
                 })
                 
             except requests.exceptions.RequestException as e:
