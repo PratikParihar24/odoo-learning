@@ -6,12 +6,19 @@ from odoo.exceptions import UserError
 class CandidateIntake(models.Model):
     _name = 'hr.candidate.intake'
     _description = 'Candidate Intake Record'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     
     # Existing Fields
-    name = fields.Char(string='Candidate Name', required=True)
-    email = fields.Char(string='Email', required=True)
+    name = fields.Char(string='Candidate Name', required=True, tracking=True)
+    email = fields.Char(string='Email', required=True, tracking=True)
     phone = fields.Char(string='Phone')
     notes = fields.Text(string='Reviewer Notes')
+    
+    # New Fields
+    linkedin_url = fields.Char(string="LinkedIn Profile")
+    degree = fields.Char(string="Degree")
+    resume_file = fields.Binary(string="Resume Document", attachment=True)
+    resume_filename = fields.Char(string="File Name")
     
     source = fields.Selection([
         ('manual', 'Manual Entry'),
@@ -55,16 +62,35 @@ class CandidateIntake(models.Model):
             if record.applicant_id:
                 raise UserError(_("This candidate has already been converted to an applicant."))
 
+            # Find or create degree in hr.recruitment.degree
+            degree_id = False
+            if record.degree:
+                degree = self.env['hr.recruitment.degree'].sudo().search([('name', '=ilike', record.degree.strip())], limit=1)
+                if not degree:
+                    degree = self.env['hr.recruitment.degree'].sudo().create({'name': record.degree.strip()})
+                degree_id = degree.id
+
             applicant_vals = {
                 'name': f"Intake: {record.name}",
                 'partner_name': record.name,
                 'email_from': record.email,
                 'partner_phone': record.phone,
                 'job_id': record.job_id.id if record.job_id else False,
+                'linkedin_profile': record.linkedin_url,
+                'type_id': degree_id,
                 'description': f"AI Score: {record.ai_score}/100\n\nAI Summary:\n{record.ai_summary}\n\nReviewer Notes:\n{record.notes}",
             }
             
             new_applicant = self.env['hr.applicant'].create(applicant_vals)
+            
+            # Copy attachment
+            if record.resume_file:
+                self.env['ir.attachment'].create({
+                    'name': record.resume_filename or 'resume.pdf',
+                    'datas': record.resume_file,
+                    'res_model': 'hr.applicant',
+                    'res_id': new_applicant.id,
+                })
             
             record.write({
                 'status': 'approved',
@@ -74,8 +100,24 @@ class CandidateIntake(models.Model):
     # --- PHASE 2: AI API CALL ---
     def action_analyze_resume(self):
         for record in self:
+            if record.resume_file:
+                import io
+                import base64
+                import PyPDF2
+                try:
+                    pdf_bytes = base64.b64decode(record.resume_file)
+                    pdf_file = io.BytesIO(pdf_bytes)
+                    pdf_reader = PyPDF2.PdfReader(pdf_file)
+                    text = ""
+                    for page in pdf_reader.pages:
+                        text += (page.extract_text() or "") + "\n"
+                    if text.strip():
+                        record.resume_text = text.strip()
+                except Exception as e:
+                    pass
+
             if not record.resume_text:
-                raise UserError(_("Please paste the resume text before running AI analysis."))
+                raise UserError(_("Please upload a valid PDF resume or ensure there is text in the Resume Text field before running AI analysis."))
             
             # For a production app, we would store this key in Odoo's ir.config_parameter settings.
             # For this build, paste your key directly here.

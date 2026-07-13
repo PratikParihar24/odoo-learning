@@ -8,7 +8,7 @@
         into official applicants in the Recruitment pipeline.
     """,
     'author': 'Pratik',
-    'depends': ['base', 'hr', 'hr_recruitment', 'website'], 
+    'depends': ['base', 'hr', 'hr_recruitment', 'website', 'mail'], 
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

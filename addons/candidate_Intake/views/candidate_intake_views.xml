@@ -48,11 +48,15 @@
                             <field name="name"/>
                             <field name="email"/>
                             <field name="phone"/>
+                            <field name="linkedin_url" widget="url"/>
+                            <field name="degree"/>
                         </group>
                         <group id="right_column">
                             <field name="job_id"/>
                             <field name="source"/>
                             <field name="applicant_id" invisible="not applicant_id"/>
+                            <field name="resume_filename" invisible="1"/>
+                            <field name="resume_file" filename="resume_filename" widget="binary"/>
                         </group>
                     </group>
                     <notebook>
@@ -67,6 +71,11 @@
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>

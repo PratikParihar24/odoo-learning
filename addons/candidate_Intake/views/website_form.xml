@@ -4,7 +4,7 @@
         <t t-call="website.layout">
             <div id="wrap" class="container mt-5 mb-5">
                 <h1 class="text-center mb-4">Apply for a Position</h1>
-                <form action="/jobs/submit" method="POST" class="w-50 mx-auto">
+                <form action="/jobs/submit" method="POST" enctype="multipart/form-data" class="w-50 mx-auto">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     
                     <div class="mb-3">
@@ -29,8 +29,16 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label>Paste Resume</label>
-                        <textarea name="resume_text" class="form-control" rows="6" required="1"></textarea>
+                        <label>LinkedIn Profile</label>
+                        <input type="text" name="linkedin_url" class="form-control"/>
+                    </div>
+                    <div class="mb-3">
+                        <label>Degree</label>
+                        <input type="text" name="degree" class="form-control"/>
+                    </div>
+                    <div class="mb-3">
+                        <label>Resume File</label>
+                        <input type="file" name="resume_file" class="form-control" accept=".pdf,.doc,.docx" required="1"/>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Submit Application</button>
                 </form>

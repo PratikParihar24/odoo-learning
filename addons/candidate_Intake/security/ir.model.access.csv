@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_candidate_intake_user,access.hr.candidate.intake.user,model_hr_candidate_intake,base.group_user,1,1,1,1
+access_hr_candidate_intake_reviewer,access.hr.candidate.intake.reviewer,model_hr_candidate_intake,group_intake_reviewer,1,1,1,0
+access_hr_candidate_intake_manager,access.hr.candidate.intake.manager,model_hr_candidate_intake,group_intake_manager,1,1,1,1
